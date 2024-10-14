@@ -2,16 +2,18 @@ package org.example;
 
 //import com.microsoft.sqlserver;
 
-//import com.microsoft.sqlserver;
-
 import java.sql.*;
+import io.github.cdimascio.dotenv.Dotenv;
 
 
 public class DbConnector {
     public int getCarrierId(String getCarrieName){
-        String connectionUrl = "jdbc:sqlserver://nbotcproduse2dbsrv;databaseName=NBAPP_SUP;user=MaskUser;password=Ma$kus36;";
+        Dotenv dotenv = Dotenv.load();
+        String url = dotenv.get("DB_URL");
+        String username = dotenv.get("DB_USERNAME");
+        String password = dotenv.get("DB_PASSWORD");
         try{
-            Connection connection = DriverManager.getConnection(connectionUrl);
+            Connection connection = DriverManager.getConnection(url, username, password);
             if(connection != null){
                 System.out.println("Connected to database");
             }else {
