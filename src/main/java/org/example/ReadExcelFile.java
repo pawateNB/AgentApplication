@@ -7,13 +7,28 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 public class ReadExcelFile {
+    private static String getString(Cell cell) {
+        String value = (String) cell.getStringCellValue();
+        String word="string";
+        if(value.equalsIgnoreCase("Create Credentials")) {
+            word = "new";
+        } else if (value.equals("Delete and Create New")) {
+            word = "reset";
+        } else if (value.equals("Delete Credentials")) {
+            word = "delete";
+        } else if (value.isEmpty()) {
+            word = "string";
+        }else{
+            word = value.trim();
+        }
+        return (word.equals(""))?"string":word;
+    }
     //ColumnData Extraction Method
     public static ArrayList<String> getColumnData(Sheet sheet,String columnName,CellType cellType){
         ArrayList<String> columnData = new ArrayList<>();
         Row headerRow = sheet.getRow(0);
         int columnIndex=-1;
 
-        //Index of the specified column
         for(Cell cell : headerRow){
             if(cell.getStringCellValue().equalsIgnoreCase(columnName)){
                 columnIndex = cell.getColumnIndex();
@@ -30,40 +45,33 @@ public class ReadExcelFile {
             if(row!=null){
                 Cell cell = row.getCell(columnIndex);
                 if(cell!=null && cell.getCellType() == cellType){
-                    String value = (String) cell.getStringCellValue();
-                    String word="";
-                    if(value.equalsIgnoreCase("Create Credentials")) {
-                        word = "create";
-                    } else if (value.equals("Delete and Create New")) {
-                        word = "reset";
-                    } else if (value.equals("Delete Credentials")) {
-                        word = "delete";
-                    } else{
-                        word = value.trim();
-                    }
+                    String word = getString(cell);
                     columnData.add(word);
+                } else if (cell == null){
+                    columnData.add("string");
                 }
             }
         }
         return columnData;
     }
 
-
     public static void main(String[] args) {
         DbConnector dbConnector = new DbConnector();
         String excelFilePath = "C:\\Users\\ParthAwate\\Downloads\\credentials.xlsx";
         String columnName1 = "CarrierName";
-        String columnName2 = "FirstName";
-        String columnName3 = "SecondName";
-        String columnName4 = "Email";
-        String columnName5 = "PortalType";
-        String columnName6 = "ActionType";
+        String columnName2 = "PortalType";
+        String columnName3 = "ActionType";
+        String columnName4 = "FirstName";
+        String columnName5 = "SecondName";
+        String columnName6 = "Email";
+        String columnName7 = "Username";
         ArrayList<String> carrierNames = new ArrayList<>();
         ArrayList<String> firstNames = new ArrayList<>();
         ArrayList<String> secondNames = new ArrayList<>();
         ArrayList<String> emails = new ArrayList<>();
         ArrayList<String> portalTypes = new ArrayList<>();
-        ArrayList<String> ActionTypes = new ArrayList<>();
+        ArrayList<String> actionTypes = new ArrayList<>();
+        ArrayList<String> userNames = new ArrayList<>();
 
         try(
                 FileInputStream file = new FileInputStream(new File(excelFilePath));
@@ -71,18 +79,20 @@ public class ReadExcelFile {
                 ){
             Sheet sheet = workbook.getSheetAt(0);
             carrierNames = getColumnData(sheet,columnName1,CellType.STRING);
-            firstNames = getColumnData(sheet,columnName2,CellType.STRING);
-            secondNames = getColumnData(sheet,columnName3,CellType.STRING);
-            emails = getColumnData(sheet,columnName4,CellType.STRING);
-            portalTypes = getColumnData(sheet,columnName5,CellType.STRING);
-            ActionTypes = getColumnData(sheet,columnName6,CellType.STRING);
+            portalTypes = getColumnData(sheet,columnName2,CellType.STRING);
+            actionTypes = getColumnData(sheet,columnName3,CellType.STRING);
+            firstNames = getColumnData(sheet,columnName4,CellType.STRING);
+            secondNames = getColumnData(sheet,columnName5,CellType.STRING);
+            emails = getColumnData(sheet,columnName6,CellType.STRING);
+            userNames = getColumnData(sheet,columnName7,CellType.STRING);
 
             System.out.println(carrierNames);
             System.out.println(portalTypes);
-            System.out.println(ActionTypes);
+            System.out.println(actionTypes);
             System.out.println(firstNames);
             System.out.println(secondNames);
             System.out.println(emails);
+            System.out.println(userNames);
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -94,6 +104,6 @@ public class ReadExcelFile {
 
 
         ApiConnector apiConnector = new ApiConnector();
-        apiConnector.connectToApiNew(carrierIds, firstNames, secondNames, emails);
+        apiConnector.connectToApi(carrierIds,portalTypes,actionTypes,firstNames,secondNames,emails,userNames);
     }
 }
