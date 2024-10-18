@@ -7,19 +7,28 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 
 public class DbConnector {
-    public int getCarrierId(String getCarrieName){
-        Dotenv dotenv = Dotenv.load();
-//
-        String connectionUrl = dotenv.get("DB_CONNECTION_STRING");
-
+    Connection connection;
+    Statement statement;
+    Dotenv dotenv = Dotenv.load();
+    String connectionUrl = dotenv.get("DB_CONNECTION_STRING");
+    public DbConnector(){
         try{
-            Connection connection = DriverManager.getConnection(connectionUrl);
-            if(connection != null){
-                System.out.println("Connected to database");
-            }else {
-                System.out.println("Failed to connect to database");
+            connection = DriverManager.getConnection(connectionUrl);
+            statement = connection.createStatement();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public int getCarrierId(String getCarrierName) {
+        String cName= "%" + getCarrierName.replace(" ", "%")+"%";
+        String query = "SELECT InsuranceCarrierID from Insurance.InsuranceCarriers where InsuranceCarrierName like '"+cName+"';";
+        try {
+            ResultSet resultSet = statement.executeQuery(query);
+            while(resultSet.next()) {
+                int carrierId = resultSet.getInt("InsuranceCarrierID");
+                return carrierId;
             }
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -30,7 +39,7 @@ public class DbConnector {
     }
     public static void main(String[] args) {
         DbConnector dbConnector = new DbConnector();
-        dbConnector.getCarrierId("aetna");
+        System.out.println(dbConnector.getCarrierId("Aetna"));
     }
 
 
