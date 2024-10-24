@@ -22,6 +22,7 @@ public class DbConnector {
                 connection = DriverManager.getConnection(connectionUrl1);
             } else if (db == 'E') {
                 connection = DriverManager.getConnection(connectionUrl2);
+                System.out.println("Connection to EHCRM_SUP successful");
             }
             statement = connection.createStatement();
         } catch (SQLException e) {
@@ -61,7 +62,7 @@ public class DbConnector {
 
     // Main method for testing
     public static void main(String[] args) {
-        DbConnector dbConnector = new DbConnector('N');
-        System.out.println(dbConnector.getCarrierId("Aetna"));
+        DbConnector dbConnector = new DbConnector('E');
+        System.out.println(dbConnector.getCarrierId("Elevance Health"));
     }
 }

@@ -76,22 +76,23 @@ public class CredentialGeneratorApp extends JFrame {
 
                 // Load the Excel file and extract data
                 Workbook workbook = excelReader.loadExcelFile(selectedFile.getAbsolutePath());
-                Sheet sheet = workbook.getSheetAt(0);
-                Map<String, List<String>> extractedData = excelReader.extractColumnsData(sheet, ReadExcelFile.COLUMN_NAMES);
+                for(int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
+                    Sheet sheet = workbook.getSheetAt(sheetIndex);
+                    Map<String,List<String>> extractedData = excelReader.extractColumnsData(sheet,ReadExcelFile.COLUMN_NAMES);
 
-                // Fetch carrier IDs and connect to API
-                List<Integer> carrierIds = excelReader.fetchCarrierIds(dbConnector, extractedData.get(ReadExcelFile.COLUMN_NAMES[0]));
-                apiConnector.connectToApi(carrierIds,
-                        extractedData.get(ReadExcelFile.COLUMN_NAMES[1]), // portalTypes
-                        extractedData.get(ReadExcelFile.COLUMN_NAMES[2]), // actionTypes
-                        extractedData.get(ReadExcelFile.COLUMN_NAMES[3]), // firstNames
-                        extractedData.get(ReadExcelFile.COLUMN_NAMES[4]), // secondNames
-                        extractedData.get(ReadExcelFile.COLUMN_NAMES[5]), // emails
-                        extractedData.get(ReadExcelFile.COLUMN_NAMES[6]), // userNames
-                        dbType);
-
-                // Update the output Excel file with credentials
-                excelReader.updateExcelWithCredentials(selectedFile.getAbsolutePath(), apiConnector.returnedUsernames, apiConnector.returnedPasswords);
+                    List<Integer> carrierIds = excelReader.fetchCarrierIds(dbConnector,extractedData.get(ReadExcelFile.COLUMN_NAMES[0]));
+                    apiConnector.connectToApi(carrierIds,
+                            extractedData.get(ReadExcelFile.COLUMN_NAMES[1]),
+                            extractedData.get(ReadExcelFile.COLUMN_NAMES[2]),
+                            extractedData.get(ReadExcelFile.COLUMN_NAMES[3]),
+                            extractedData.get(ReadExcelFile.COLUMN_NAMES[4]),
+                            extractedData.get(ReadExcelFile.COLUMN_NAMES[5]),
+                            extractedData.get(ReadExcelFile.COLUMN_NAMES[6]),
+                            dbType);
+                    excelReader.updateExcelWithCredentials(selectedFile.getAbsolutePath(),apiConnector.returnedUsernames,apiConnector.returnedPasswords,sheetIndex);
+                    apiConnector.returnedPasswords = new ArrayList<>();
+                    apiConnector.returnedUsernames = new ArrayList<>();
+                }
 
                 statusLabel.setText("Credentials generated successfully!");
 

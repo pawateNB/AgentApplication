@@ -2,12 +2,14 @@ package org.example;
 
 import java.io.*;
 import java.util.*;
+
+import com.sun.tools.javac.Main;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ReadExcelFile {
 
-    public static final String[] COLUMN_NAMES = { "CarrierName", "PortalType", "ActionType", "FirstName", "SecondName", "Email", "Username" };;
+    public static final String[] COLUMN_NAMES = { "CarrierName", "PortalType", "ActionType", "FirstName", "SecondName", "Email", "Username" };
     private static final String DEFAULT_STRING = "string";
     private static final String EXCEL_FILE_PATH = "C:\\Users\\ParthAwate\\ExcelSheets\\CredCheck.xlsx";
 
@@ -148,10 +150,10 @@ public class ReadExcelFile {
         }
     }
 
-    public void updateExcelWithCredentials(String excelFilePath, List<String> usernames, List<String> passwords) {
+    public void updateExcelWithCredentials(String excelFilePath, List<String> usernames, List<String> passwords,int idx) {
         try (FileInputStream file = new FileInputStream(new File(excelFilePath))) {
             Workbook workbook = new XSSFWorkbook(file);
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(idx);
             int usernameColumn = findOrCreateColumn(sheet, "Username");
             int passwordColumn = findOrCreateColumn(sheet, "Password");
 

@@ -23,7 +23,7 @@ public class ApiConnector {
                 String jsonRequest = prepareJsonRequest(carrierIds.get(i), portalTypes.get(i), actionTypes.get(i),
                         firstNames.get(i), secondNames.get(i), emails.get(i),
                         userNames.get(i), val);
-                String responseBody = sendApiRequest(jsonRequest);
+                String responseBody = sendApiRequest(jsonRequest,val);
                 processApiResponse(responseBody);
                 Thread.sleep(3000); // Adding delay
             }
@@ -45,9 +45,15 @@ public class ApiConnector {
     }
 
     // Send API request and return response body
-    private String sendApiRequest(String json) throws IOException, InterruptedException {
+    private String sendApiRequest(String json,char val) throws IOException, InterruptedException {
+        String uri;
+        if(val == 'N'){
+            uri = "https://nbotc-train-use2-auth-app.azurewebsites.net/api/User/CreateAgentCredentials";
+        } else {
+            uri = "https://nbantm-train-use2-auth-app.azurewebsites.net/api/User/CreateAgentCredentials";
+        }
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://nbotc-train-use2-auth-app.azurewebsites.net/api/User/CreateAgentCredentials"))
+                .uri(URI.create(uri))
                 .header("Content-Type", "application/json-patch+json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
